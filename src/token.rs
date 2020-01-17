@@ -90,6 +90,14 @@ impl Token {
 
         Ok(Token { claims })
     }
+
+    pub fn exp(&self) -> &DateTime<Utc> {
+        &self.claims.exp
+    }
+
+    pub fn sub(&self) -> &str {
+        &self.claims.sub
+    }
 }
 
 fn sign<S>(data: &str, secret: S) -> Result<String, TokenError>
