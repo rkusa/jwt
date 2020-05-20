@@ -3,11 +3,12 @@ use std::pin::Pin;
 use std::str::FromStr;
 
 use crate::token::Token;
-use tide::http_types::headers::HeaderName;
-use tide::http_types::StatusCode;
-use tide::middleware::{Middleware, Next};
+use tide::http::headers::HeaderName;
+use tide::http::StatusCode;
+use tide::{Middleware, Next};
 use tide::{Request, Response};
 
+#[derive(Debug)]
 pub struct AuthorizationMiddleware {
     secret: String,
 }
@@ -23,7 +24,7 @@ impl AuthorizationMiddleware {
         &'a self,
         cx: Request<State>,
         next: Next<'a, State>,
-    ) -> Response {
+    ) -> tide::Result {
         let token = from_header(&cx, &self.secret)
             .or_else(|| from_cookie(&cx, &self.secret))
             .and_then(|token| {
@@ -35,7 +36,7 @@ impl AuthorizationMiddleware {
             });
         match token {
             Some(token) => next.run(cx.set_local(token)).await,
-            None => Response::new(StatusCode::Forbidden),
+            None => Ok(Response::new(StatusCode::Forbidden)),
         }
     }
 }
@@ -64,7 +65,7 @@ impl<State: Send + Sync + 'static> Middleware<State> for AuthorizationMiddleware
         &'a self,
         cx: Request<State>,
         next: Next<'a, State>,
-    ) -> Pin<Box<dyn Future<Output = Response> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = tide::Result> + Send + 'a>> {
         Box::pin(async move { self.authorize(cx, next).await })
     }
 }
