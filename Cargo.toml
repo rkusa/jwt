@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-base64 = "0.11"
+base64 = "0.12"
 chrono = { version = "0.4", features = ["serde"] }
 futures = "0.3"
 hmac = "0.7"
@@ -19,7 +19,7 @@ sha2 = "0.8"
 subtle = "2.2"
 thiserror = "1.0"
 warp = { version = "0.2", optional = true }
-tide = { version = "0.8", optional = true }
+tide = { version = "0.9", optional = true }
 
 [features]
 default = ["warp-filter"]

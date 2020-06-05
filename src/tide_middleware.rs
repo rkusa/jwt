@@ -35,7 +35,7 @@ impl AuthorizationMiddleware {
                 }
             });
         match token {
-            Some(token) => next.run(cx.set_local(token)).await,
+            Some(token) => next.run(cx.set_ext(token)).await,
             None => Ok(Response::new(StatusCode::Forbidden)),
         }
     }
@@ -76,7 +76,7 @@ trait RequestExt {
 
 impl<State: Send + Sync + 'static> RequestExt for Request<State> {
     fn token(&self) -> tide::Result<&Token> {
-        self.local::<Token>()
+        self.ext::<Token>()
             .ok_or_else(|| tide::Error::from_str(StatusCode::Forbidden, "unauthorized access"))
     }
 }
